@@ -4,7 +4,6 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 
-
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
@@ -43,36 +42,33 @@ const handleDelete = (event) => {
 }
 
 const addName = (e) => {
-  e.preventDefault()  
-  
- 
- const matchPerson = persons.find(person => person.name.toLowerCase() === newName.toLowerCase())
- // const matchPersonId = Number(matchPerson.id)
+  e.preventDefault()
+  const matchPerson = persons.find(person => person.name.toLowerCase() === newName.toLowerCase())
   const person={...matchPerson,number:newNumber}
   const id=person.id
   const name = person.name
-  //const checkName = (persons.map(person => person.name.toLowerCase()).includes(newName.toLowerCase()))
-  //console.log(checkName)
-  const confirm = window.confirm(` ${name} already exists. DO you want to change the number?`)
- if (matchPerson && confirm) {
-    axios.put(`${baseUrl}/${id}`,person)
-    .then((res)=>{
-      console.log(res.data)
-     setPersons(persons.map((pers)=>pers.id===id ? res.data:pers))
-    })
-       
-  }
-  else if(matchPerson && !confirm){
-    setPersons(persons)
-  }
+  
+  if (matchPerson) {
+    const confirm = window.confirm(` ${name} already exists. DO you want to change the number?`)
+    if(confirm){
+        axios.put(`${baseUrl}/${id}`,person)
+        .then((res)=>{
+          console.log(res.data)
+        setPersons(persons.map((pers)=>pers.id===id ? res.data:pers))
+        })
+    }else {
+      setPersons(persons)
+    }
+        
+    }
 
-  else{
-    const person = {name: newName, number: newNumber, id: Math.floor(Math.random() * 100)}
-    axios.post(baseUrl,person)
-    .then(
-      setPersons([...persons,person])
-    )
-  }
+    else{
+      const person = {name: newName, number: newNumber, id: Math.floor(Math.random() * 100)}
+      axios.post(baseUrl,person)
+      .then(
+        setPersons([...persons,person])
+      )
+    }
 }
 const FilteredNames =  persons.filter(person => person.name.toLowerCase().includes(searchName.toLowerCase()))
 
