@@ -10,7 +10,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const[searchName, setSearchName] = useState('')
 
-  const baseUrl = 'http://localhost:3001/api/persons'
+  const baseUrl = '/api/persons'
 
   useEffect(() =>{
     axios.get(baseUrl)
@@ -29,7 +29,10 @@ const handleNumberChange = (event) => {
   setNewNumber(event.target.value)  
 } 
 const handleSearch = (event) => setSearchName(event.target.value)
+
+//For deleting a person
 const handleDelete = (event) => {
+  event.preventDefault()
   const id = event.target.value
 
   axios.delete(`${baseUrl}/${id}`)
@@ -41,26 +44,33 @@ const handleDelete = (event) => {
   )
 }
 
+//For adding persons
 const addName = (e) => {
   e.preventDefault()
-  const matchPerson = persons.find(person => person.name.toLowerCase() === newName.toLowerCase())
-  const person={...matchPerson,number:newNumber}
-  const id=person.id
-  const name = person.name
+  const matchPerson = persons.find((person) => person.name.toLowerCase() === newName.toLowerCase())
+  
   
   if (matchPerson) {
+    const person={...matchPerson,number:newNumber}
+    const id=person.id
+    const name = person.name
+    
     const confirm = window.confirm(` ${name} already exists. DO you want to change the number?`)
     if(confirm){
         axios.put(`${baseUrl}/${id}`,person)
         .then((res)=>{
           console.log(res.data)
-        setPersons(persons.map((pers)=>pers.id===id ? res.data:pers))
+        setPersons(persons.map((person)=>person.id===id ? res.data:person))
         })
-    }else {
-      setPersons(persons)
+    }if(!confirm) {
+      axios.get(baseUrl)
+      .then(
+        response => setPersons(response.data)
+      )
     }
         
     }
+
 
     else{
       const person = {name: newName, number: newNumber, id: Math.floor(Math.random() * 100)}
@@ -70,8 +80,8 @@ const addName = (e) => {
       )
     }
 }
-const FilteredNames =  persons.filter(person => person.name.toLowerCase().includes(searchName.toLowerCase()))
-
+const FilteredNames = persons.filter((person) => person.name.includes(searchName))
+console.log(FilteredNames)
   return (
     <div>
         <h2>Phonebook</h2>

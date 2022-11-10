@@ -1,7 +1,10 @@
 import React from 'react'
 
 function Persons({FilteredNames, handleDelete}) {
+
+  console.log(FilteredNames)
     return (
+      
         <div>
             {FilteredNames.map(
                 (person) => {
